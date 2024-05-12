@@ -1,4 +1,4 @@
 export interface TabsProps {
-  selectedTab: number;
+  selectedTab: string;
   handleTabSelection: (tab: string) => void;
 }
