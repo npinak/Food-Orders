@@ -34,3 +34,19 @@
 }
 
 /* Main Section End */
+
+/* Tab Panel Start */
+
+.tabPanelContainer {
+  display: flex;
+  flex-direction: column;
+  background-color: mediumslateblue;
+  width: 80%;
+  max-width: 1200px;
+  min-height: 50%;
+  height: 600px;
+  gap: 10px;
+  overflow-y: auto;
+}
+
+/* Tab Panel  End */
