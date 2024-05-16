@@ -3,45 +3,27 @@ import { OrderTicketProps } from "./OrderTicket.types";
 
 function OrderTicket({ orderData, grayed }: OrderTicketProps) {
   return (
-    <div className={OrderTicketStyles.orderTicket}>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          width: "50%",
-          height: "50%",
-        }}
-      >
-        {orderData.customer}
+    <div
+      className={`${
+        grayed
+          ? OrderTicketStyles.orderTicket_grayed
+          : OrderTicketStyles.orderTicket
+      }`}
+    >
+      <div className={OrderTicketStyles.orderTicketSection}>
+        <p className={OrderTicketStyles.orderTicketSection_Left}>
+          {orderData.customer}
+        </p>
       </div>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          width: "50%",
-          height: "50%",
-        }}
-      >
+      <div className={OrderTicketStyles.orderTicketSection}>
         {orderData.item}
       </div>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          width: "50%",
-          height: "50%",
-        }}
-      >
-        {orderData.destination}
+      <div className={OrderTicketStyles.orderTicketSection}>
+        <p className={OrderTicketStyles.orderTicketSection_Left}>
+          {orderData.destination}
+        </p>
       </div>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          width: "50%",
-          height: "50%",
-        }}
-      >
+      <div className={OrderTicketStyles.orderTicketSection}>
         {orderData.price}
       </div>
     </div>

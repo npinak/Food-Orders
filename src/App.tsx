@@ -1,15 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import Tabs from "./components/TabButtons";
 import OrderTicket from "./components/OrderTicket";
 import { useOrderData } from "./utils/useOrderData";
-import {
-  OrderDataState,
-  OrderDataType,
-  OrderMapType,
-} from "./Types/OrderDataTypes";
+import { OrderDataType } from "./Types/OrderDataTypes";
 import "./App.css";
-
-//todo sort items using sent_at_second
 
 function App() {
   const [selectedTab, setSelectedTab] = useState<string>("0");
@@ -44,16 +38,16 @@ function App() {
   ] = useOrderData();
   const [
     addCancelledOrders,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     deleteCancelledOrders,
     cancelledOrders,
     grayedCancelledOrders,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     cancelledMap,
   ] = useOrderData();
 
   // @ts-expect-error -- socket is imported via CDN
-  socket.on("order_event", (order) => {
-    // todo have to add type to order
-
+  socket.on("order_event", (order: OrderDataType[]) => {
     const orderArray: OrderDataType[][] = [[], [], [], [], []];
 
     order.forEach((orderEvent: OrderDataType) => {
@@ -68,10 +62,6 @@ function App() {
       } else {
         orderArray[4].push(orderEvent);
       }
-
-      cancelledMap.current?.set(orderEvent.id, {
-        currentStatus: orderEvent.event_name,
-      });
     });
 
     if (orderArray[0].length > 0) {
@@ -85,43 +75,52 @@ function App() {
 
       deleteCreatedOrders(cookedArray);
     }
+    if (orderArray[2].length > 0) {
+      const driverArray = orderArray[2];
+      addDriverOrders(driverArray);
 
-    // if (orderArray[2].length > 0) {
-    //   const driverArray = orderArray[2];
-    //   addDriverOrders(driverArray);
-    //   deleteCookedOrders(driverArray);
-    // }
-    // if (orderArray[3].length > 0) {
-    //   const deliveredArray = orderArray[3];
-    //   addDeliveredOrders(deliveredArray);
-    //   deleteDriverOrders(deliveredArray);
-    // }
-    // if (orderArray[4].length > 0) {
-    //   const cancelledArray = orderArray[4];
-    //   addCancelledOrders(cancelledArray);
-    //   // for each item in the cancelled array, look in each HashMap for the order and cancel it
-    //   // in the appropriate hook.
+      deleteCookedOrders(driverArray);
+    }
+    if (orderArray[3].length > 0) {
+      const deliveredArray = orderArray[3];
+      addDeliveredOrders(deliveredArray);
 
-    //   orderArray[4].forEach((cancelledOrder) => {
-    //     //check which hashMap it is in
-    //     //call the remove function for that order state
-    //     const orderCurrentStatus =cancelledMap.current?.get(cancelledOrder.id)?.currentStatus
+      deleteDriverOrders(deliveredArray);
+    }
+    if (orderArray[4].length > 0) {
+      const cancelledArray = orderArray[4];
+      addCancelledOrders(cancelledArray);
 
-    //      if (orderCurrentStatus === "CREATED") {
-    //        deleteCreatedOrders([cancelledOrder]);
-    //      } else if (orderCurrentStatus === "COOKED") {
-    //        deleteCookedOrders([cancelledOrder]);
-    //      } else if (orderCurrentStatus === "DRIVER_RECEIVED") {
-    //        deleteDriverOrders([cancelledOrder])
-    //      } else if (orderCurrentStatus === "DELIVERED") {
-    //        deleteDeliveredOrders([cancelledOrder])
-    //      }
-    //     //  else {
-    //     //    orderArray[4].push(orderEvent);
-    //     //  }
+      const removeArray: OrderDataType[][] = [[], [], [], []];
 
-    //   });
-    // }
+      cancelledArray.forEach((cancelledOrder) => {
+        if (createdMap.current.has(cancelledOrder.id)) {
+          removeArray[0].push(cancelledOrder);
+        }
+        if (cookedMap.current.has(cancelledOrder.id)) {
+          removeArray[1].push(cancelledOrder);
+        }
+        if (driverMap.current.has(cancelledOrder.id)) {
+          removeArray[2].push(cancelledOrder);
+        }
+        if (deliveredMap.current.has(cancelledOrder.id)) {
+          removeArray[3].push(cancelledOrder);
+        }
+      });
+
+      if (removeArray[0].length > 0) {
+        deleteCreatedOrders(removeArray[0]);
+      }
+      if (removeArray[1].length > 0) {
+        deleteCookedOrders(removeArray[1]);
+      }
+      if (removeArray[2].length > 0) {
+        deleteDriverOrders(removeArray[2]);
+      }
+      if (removeArray[3].length > 0) {
+        deleteDeliveredOrders(removeArray[3]);
+      }
+    }
   });
 
   const handleTabSelection = (tab: string): void => {
@@ -153,8 +152,6 @@ function App() {
           selectedTab={selectedTab}
           handleTabSelection={handleTabSelection}
         />
-        {/* send data to TabPanel according to the tab selected */}
-        {/* <TabPanel orderData={getComponentData()} /> */}
         <section className="tabPanelContainer">
           {switchOrderData()![0].map((order) => {
             return (

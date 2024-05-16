@@ -6,6 +6,7 @@ function TabButtons({ selectedTab, handleTabSelection }: TabsProps) {
   return (
     <menu className={ButtonStyles.tabButtons}>
       <button
+        id={ButtonStyles.createdButton}
         className={`${ButtonStyles.button} ${
           selectedTab === "0" ? ButtonStyles.buttonCreated : ""
         }`}
@@ -57,6 +58,7 @@ function TabButtons({ selectedTab, handleTabSelection }: TabsProps) {
         className={`${ButtonStyles.button} ${
           selectedTab === "4" ? ButtonStyles.buttonCancelled : ""
         }`}
+        id={ButtonStyles.cancelledButton}
         onClick={(e) => {
           handleTabSelection(e.currentTarget.value);
         }}

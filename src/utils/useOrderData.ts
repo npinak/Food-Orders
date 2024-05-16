@@ -1,6 +1,6 @@
 import { OrderMapType, OrderDataType } from "../Types/OrderDataTypes";
 
-import { useState, useRef, MutableRefObject, useEffect } from "react";
+import { useState, useRef, MutableRefObject } from "react";
 
 export function useOrderData(): [
   (order: OrderDataType[]) => void,
@@ -12,14 +12,11 @@ export function useOrderData(): [
   const [orders, setOrders] = useState<OrderDataType[]>([]);
   const [grayedOrders, setGrayedOrders] = useState<OrderDataType[]>([]);
   const orderMap = useRef(new Map<string, OrderMapType>());
-  const savedCallback = useRef<() => void>();
 
   const addOrder = (order: OrderDataType[]) => {
     const newOrderArray: OrderDataType[] = [...orders, ...order];
 
     setOrders(newOrderArray);
-
-    //todo add to Map
 
     order.forEach((orderEvent, index) => {
       orderMap.current.set(orderEvent.id, {
@@ -28,41 +25,6 @@ export function useOrderData(): [
       });
     });
   };
-
-  //todo might not need
-  // const findOrder = (order: OrderDataState) => {
-  //   if (orderMap.current?.has(order.id)) {
-  //     return true;
-  //   } else {
-  //     return false;
-  //   }
-  // };
-
-  //todo might not need
-  // const updateOrderDeleteStatus = (order: OrderDataState[]) => {
-  //   const newArray = structuredClone(orders);
-
-  //   order.forEach((orderEvent) => {
-  //     const deleteObj = orderMap.current?.get(orderEvent.id);
-
-  //     const arrayObj = newArray[deleteObj!.index];
-
-  //     if (arrayObj === undefined) {
-  //       return;
-  //     }
-
-  //     arrayObj["delete_status"] = true;
-  //     newArray[deleteObj!.index] = arrayObj;
-  //   });
-
-  //   setOrders(newArray);
-  // };
-
-  useEffect(() => {
-    // if grayedOrders > 10 keep only the last 10 values
-
-    console.log(grayedOrders);
-  }, [grayedOrders]);
 
   const deleteOrder = (order: OrderDataType[]) => {
     order.sort((a, b) => {

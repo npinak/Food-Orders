@@ -1,10 +1,31 @@
 .orderTicket {
   display: flex;
   flex-wrap: wrap;
-  width: 100%;
-  background-color: orange;
-  height: 13%;
+  width: 90%;
+  background-color: #fff1e6;
+
   min-height: 60px;
-  margin-top: 10px;
   margin-bottom: 10px;
+  border-radius: 20px;
+}
+
+.orderTicket_grayed {
+  display: flex;
+  flex-wrap: wrap;
+  width: 90%;
+  background-color: #988f89;
+  min-height: 60px;
+  margin-bottom: 10px;
+  border-radius: 20px;
+}
+
+.orderTicketSection {
+  display: flex;
+  align-items: center;
+  width: 50%;
+  height: 50%;
+}
+
+.orderTicketSection_Left {
+  margin-left: 20px;
 }

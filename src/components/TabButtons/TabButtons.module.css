@@ -1,11 +1,17 @@
 .tabButtons {
   display: flex;
-  background-color: green;
   width: 80%;
   max-width: 1200px;
   min-height: 10%;
   height: 50px;
-  gap: 10px;
+}
+
+#createdButton {
+  border-top-left-radius: 20px;
+}
+
+#cancelledButton {
+  border-top-right-radius: 20px;
 }
 
 .button {
@@ -26,21 +32,33 @@
   background-color: #97c0d8;
 }
 .buttonCreated:hover {
-  background-color: #40ed07;
+  background-color: #97c0d8;
 }
 
 .buttonCooked {
-  background-color: #ffe20a;
+  background-color: #ffec5c;
+}
+.buttonCooked:hover {
+  background-color: #ffec5c;
 }
 
 .buttonDriver {
-  background-color: #a27e8e;
+  background-color: #eceae9;
+}
+.buttonDriver:hover {
+  background-color: #eceae9;
 }
 
 .buttonDelivered {
-  background-color: #247f36;
+  background-color: #afe9bb;
+}
+.buttonDelivered:hover {
+  background-color: #afe9bb;
 }
 
 .buttonCancelled {
-  background-color: #df1001;
+  background-color: #fe7b72;
+}
+.buttonCancelled:hover {
+  background-color: #fe7b72;
 }
