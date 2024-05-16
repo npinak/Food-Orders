@@ -21,5 +21,5 @@ export interface OrderDataState {
 
 export interface OrderMapType {
   currentStatus: string;
-  index: number;
+  index?: number;
 }

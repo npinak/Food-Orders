@@ -1,26 +1,21 @@
-import { OrderDataState, OrderMapType } from "../Types/OrderDataTypes";
+import { OrderMapType, OrderDataType } from "../Types/OrderDataTypes";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, MutableRefObject, useEffect } from "react";
 
 export function useOrderData(): [
-  (order: OrderDataState[]) => void,
-  (order: OrderDataState[]) => void,
-  OrderDataState[]
+  (order: OrderDataType[]) => void,
+  (order: OrderDataType[]) => void,
+  OrderDataType[],
+  OrderDataType[],
+  MutableRefObject<Map<string, OrderMapType>>
 ] {
-  const [orders, setOrders] = useState<OrderDataState[]>([]);
-  const orderStateRef = useRef(orders);
+  const [orders, setOrders] = useState<OrderDataType[]>([]);
+  const [grayedOrders, setGrayedOrders] = useState<OrderDataType[]>([]);
   const orderMap = useRef(new Map<string, OrderMapType>());
+  const savedCallback = useRef<() => void>();
 
-  useEffect(() => {
-    orderStateRef.current = orders;
-  }, [orders]);
-
-  useEffect(() => {
-    console.log(orderStateRef.current, orders);
-  }, [orderStateRef.current]);
-
-  const addOrder = (order: OrderDataState[]) => {
-    const newOrderArray: OrderDataState[] = [...orders, ...order];
+  const addOrder = (order: OrderDataType[]) => {
+    const newOrderArray: OrderDataType[] = [...orders, ...order];
 
     setOrders(newOrderArray);
 
@@ -32,134 +27,73 @@ export function useOrderData(): [
         currentStatus: orderEvent.event_name,
       });
     });
-
-    // if (orderPresent) return;
-
-    // console.log(order);
-
-    // orderMap.current?.set(order.id, {
-    //   index: orders.length,
-    //   currentStatus: order.event_name,
-    // });
-
-    // setOrders([...orders, order]);
   };
 
-  const findOrder = (order: OrderDataState) => {
-    if (orderMap.current?.has(order.id)) {
-      return true;
-    } else {
-      return false;
-    }
-  };
+  //todo might not need
+  // const findOrder = (order: OrderDataState) => {
+  //   if (orderMap.current?.has(order.id)) {
+  //     return true;
+  //   } else {
+  //     return false;
+  //   }
+  // };
 
-  const updateOrderDeleteStatus = (order: OrderDataState[]) => {
-    const newArray = structuredClone(orders);
+  //todo might not need
+  // const updateOrderDeleteStatus = (order: OrderDataState[]) => {
+  //   const newArray = structuredClone(orders);
 
-    order.forEach((orderEvent) => {
-      const deleteObj = orderMap.current?.get(orderEvent.id);
+  //   order.forEach((orderEvent) => {
+  //     const deleteObj = orderMap.current?.get(orderEvent.id);
 
-      const arrayObj = newArray[deleteObj!.index];
+  //     const arrayObj = newArray[deleteObj!.index];
 
-      if (arrayObj === undefined) {
-        return;
-      }
+  //     if (arrayObj === undefined) {
+  //       return;
+  //     }
 
-      arrayObj["delete_status"] = true;
-      newArray[deleteObj!.index] = arrayObj;
+  //     arrayObj["delete_status"] = true;
+  //     newArray[deleteObj!.index] = arrayObj;
+  //   });
+
+  //   setOrders(newArray);
+  // };
+
+  useEffect(() => {
+    // if grayedOrders > 10 keep only the last 10 values
+
+    console.log(grayedOrders);
+  }, [grayedOrders]);
+
+  const deleteOrder = (order: OrderDataType[]) => {
+    order.sort((a, b) => {
+      return Number(b.sent_at_second) - Number(a.sent_at_second);
     });
 
-    setOrders(newArray);
+    const newGrayedOrders = [...grayedOrders, ...order];
+
+    if (newGrayedOrders.length > 10) {
+      const newGrayedOrdersSlice = newGrayedOrders.slice(
+        grayedOrders.length - 10,
+        grayedOrders.length
+      );
+
+      setGrayedOrders(newGrayedOrdersSlice);
+    } else {
+      setGrayedOrders(newGrayedOrders);
+    }
+
+    const newOrderArray = structuredClone(orders);
+
+    order.forEach((orderEvent) => {
+      const deleteIndex = orderMap.current.get(orderEvent.id)?.index;
+
+      newOrderArray.splice(deleteIndex!, 1);
+
+      orderMap.current.delete(orderEvent.id);
+    });
+
+    setOrders(newOrderArray);
   };
 
-  const deleteOrder = (order: OrderDataState[]) => {
-    // let orderPresent: boolean = false;
-
-    // order.forEach((orderEvent) => {
-    //   orderPresent = findOrder(orderEvent);
-
-    //   //todo need to check if this returns out of the forEach or the entire function
-    //   if (!orderPresent) return;
-    // });
-
-    updateOrderDeleteStatus(order);
-
-    setTimeout(() => {
-      // const previousState = structuredClone(orderStateRef.current);
-
-      order.forEach((orderEvent) => {
-        const temp = orderStateRef.current[orderStateRef.current.length - 1];
-
-        if (temp === undefined) return;
-
-        const deleteIndex = orderMap.current?.get(orderEvent.id)?.index;
-
-        orderStateRef.current[deleteIndex!] = temp;
-
-        // orderMap.current?.delete(orderEvent.id);
-
-        const updateID = temp.id;
-
-        const updateOBJ = orderMap.current?.get(updateID);
-
-        updateOBJ!["index"] = deleteIndex as number;
-
-        orderMap.current?.set(temp.id, updateOBJ!);
-        orderStateRef.current.pop();
-      });
-
-      setOrders(orderStateRef.current);
-
-      // setOrders((prevOrders) => {
-      //   // console.log(orderStateRef.current, orders);
-
-      //   order.forEach((orderEvent) => {
-      //     const temp = orderStateRef.current[orderStateRef.current.length - 1];
-
-      //     if (temp === undefined) return;
-
-      //     const deleteIndex = orderMap.current?.get(orderEvent.id)?.index;
-
-      //     orderStateRef.current[deleteIndex!] = temp;
-
-      //     // orderMap.current?.delete(orderEvent.id);
-
-      //     const updateID = temp.id;
-
-      //     const updateOBJ = orderMap.current?.get(updateID);
-
-      //     updateOBJ!["index"] = deleteIndex as number;
-
-      //     orderMap.current?.set(temp.id, updateOBJ!);
-      //     orderStateRef.current.pop();
-      //   });
-      //   return orderStateRef.current;
-      // });
-    }, 5000);
-
-    // delete using setTimeout
-    // setTimeout(() => {
-
-    //   const newOrdersArray = [...orders];
-
-    //   newOrdersArray[deleteIndex!] = temp;
-
-    //   newOrdersArray.pop();
-
-    //   setOrders(newOrdersArray);
-
-    //   orderMap.current?.delete(order.id);
-    //   //todo have to update index of moved element in map
-
-    //   const updateID = temp.id;
-
-    //   const updateOBJ = orderMap.current?.get(updateID);
-
-    //   updateOBJ!.index = deleteIndex as number;
-
-    //   orderMap.current?.set(temp.id, updateOBJ!);
-    // }, 3);
-  };
-
-  return [addOrder, deleteOrder, orders];
+  return [addOrder, deleteOrder, orders, grayedOrders, orderMap];
 }

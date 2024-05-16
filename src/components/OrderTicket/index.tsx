@@ -1,7 +1,7 @@
 import OrderTicketStyles from "./OrderTicket.module.css";
 import { OrderTicketProps } from "./OrderTicket.types";
 
-function OrderTicket({ orderData }: OrderTicketProps) {
+function OrderTicket({ orderData, grayed }: OrderTicketProps) {
   return (
     <div className={OrderTicketStyles.orderTicket}>
       <div
