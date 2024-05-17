@@ -4,7 +4,7 @@ import { OrderTicketProps } from "./OrderTicket.types";
 
 const OrderTicket = memo(({ orderData, grayed }: OrderTicketProps) => {
   return (
-    <div
+    <li
       className={`${
         grayed
           ? OrderTicketStyles.orderTicket_grayed
@@ -27,7 +27,7 @@ const OrderTicket = memo(({ orderData, grayed }: OrderTicketProps) => {
       <div className={OrderTicketStyles.orderTicketSection}>
         {orderData.price}
       </div>
-    </div>
+    </li>
   );
 });
 

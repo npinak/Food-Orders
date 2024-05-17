@@ -90,61 +90,64 @@ function App() {
 
     if (orderArray[0].length > 0) {
       const createdArray = orderArray[0];
+      console.log(createdArray);
 
       addCreatedOrders(createdArray);
     }
-    if (orderArray[1].length > 0) {
-      const cookedArray = orderArray[1];
-      addCookedOrders(cookedArray);
 
-      deleteCreatedOrders(cookedArray);
-    }
-    if (orderArray[2].length > 0) {
-      const driverArray = orderArray[2];
-      addDriverOrders(driverArray);
+    //todo uncomment this
+    // if (orderArray[1].length > 0) {
+    //   const cookedArray = orderArray[1];
+    //   addCookedOrders(cookedArray);
 
-      deleteCookedOrders(driverArray);
-    }
-    if (orderArray[3].length > 0) {
-      const deliveredArray = orderArray[3];
-      addDeliveredOrders(deliveredArray);
+    //   deleteCreatedOrders(cookedArray);
+    // }
+    // if (orderArray[2].length > 0) {
+    //   const driverArray = orderArray[2];
+    //   addDriverOrders(driverArray);
 
-      deleteDriverOrders(deliveredArray);
-    }
-    if (orderArray[4].length > 0) {
-      const cancelledArray = orderArray[4];
-      addCancelledOrders(cancelledArray);
+    //   deleteCookedOrders(driverArray);
+    // }
+    // if (orderArray[3].length > 0) {
+    //   const deliveredArray = orderArray[3];
+    //   addDeliveredOrders(deliveredArray);
 
-      const removeArray: OrderDataType[][] = [[], [], [], []];
+    //   deleteDriverOrders(deliveredArray);
+    // }
+    // if (orderArray[4].length > 0) {
+    //   const cancelledArray = orderArray[4];
+    //   addCancelledOrders(cancelledArray);
 
-      cancelledArray.forEach((cancelledOrder) => {
-        if (createdMap.current.has(cancelledOrder.id)) {
-          removeArray[0].push(cancelledOrder);
-        }
-        if (cookedMap.current.has(cancelledOrder.id)) {
-          removeArray[1].push(cancelledOrder);
-        }
-        if (driverMap.current.has(cancelledOrder.id)) {
-          removeArray[2].push(cancelledOrder);
-        }
-        if (deliveredMap.current.has(cancelledOrder.id)) {
-          removeArray[3].push(cancelledOrder);
-        }
-      });
+    //   const removeArray: OrderDataType[][] = [[], [], [], []];
 
-      if (removeArray[0].length > 0) {
-        deleteCreatedOrders(removeArray[0]);
-      }
-      if (removeArray[1].length > 0) {
-        deleteCookedOrders(removeArray[1]);
-      }
-      if (removeArray[2].length > 0) {
-        deleteDriverOrders(removeArray[2]);
-      }
-      if (removeArray[3].length > 0) {
-        deleteDeliveredOrders(removeArray[3]);
-      }
-    }
+    //   cancelledArray.forEach((cancelledOrder) => {
+    //     if (createdMap.current.has(cancelledOrder.id)) {
+    //       removeArray[0].push(cancelledOrder);
+    //     }
+    //     if (cookedMap.current.has(cancelledOrder.id)) {
+    //       removeArray[1].push(cancelledOrder);
+    //     }
+    //     if (driverMap.current.has(cancelledOrder.id)) {
+    //       removeArray[2].push(cancelledOrder);
+    //     }
+    //     if (deliveredMap.current.has(cancelledOrder.id)) {
+    //       removeArray[3].push(cancelledOrder);
+    //     }
+    //   });
+
+    //   if (removeArray[0].length > 0) {
+    //     deleteCreatedOrders(removeArray[0]);
+    //   }
+    //   if (removeArray[1].length > 0) {
+    //     deleteCookedOrders(removeArray[1]);
+    //   }
+    //   if (removeArray[2].length > 0) {
+    //     deleteDriverOrders(removeArray[2]);
+    //   }
+    //   if (removeArray[3].length > 0) {
+    //     deleteDeliveredOrders(removeArray[3]);
+    //   }
+    // }
   });
 
   const handleTabSelection = (tab: string): void => {
@@ -214,6 +217,43 @@ function App() {
     }
   }
 
+  const [scrollTop, setScrollTop] = useState(0);
+  const itemHeight = 70;
+  const overScan = 10;
+  const windowHeight = window.innerHeight * 0.9;
+  const finalWindowHeight = windowHeight * 0.8;
+  const startIndex = Math.floor(scrollTop / itemHeight);
+  const endIndex = Math.floor((scrollTop + finalWindowHeight) / itemHeight);
+  const overScanStartIndex = Math.max(0, startIndex - overScan);
+  const overScanEndIndex = Math.min(
+    switchOrderData()![0].length,
+    endIndex + overScan
+  );
+
+  let renderedNodeCount = Math.floor(windowHeight / itemHeight) + 2 * overScan;
+  renderedNodeCount = Math.min(
+    switchOrderData()![0].length - startIndex,
+    renderedNodeCount
+  );
+  function generateRows() {
+    const items: JSX.Element[] = [];
+
+    for (let i = 0; i <= renderedNodeCount; i++) {
+      if (switchOrderData()![0][i] !== undefined) {
+        items.push(
+          <OrderTicket
+            key={switchOrderData()![0][i].id}
+            orderData={switchOrderData()![0][i]}
+            grayed={false}
+          />
+        );
+      }
+    }
+
+    return items;
+  }
+
+  // console.log(switchOrderData()![0][0]);
   return (
     <>
       <header className="mainHeader">
@@ -224,7 +264,12 @@ function App() {
           selectedTab={selectedTab}
           handleTabSelection={handleTabSelection}
         />
-        <section className="tabPanelContainer">
+        <ul
+          onScroll={(e) => {
+            setScrollTop(e.currentTarget.scrollTop);
+          }}
+          className="tabPanelContainer"
+        >
           {selectedTab == "5" && (
             <div className="currencyInputContainer">
               <label style={{ fontSize: "20px" }}></label>
@@ -252,16 +297,37 @@ function App() {
               />
             </div>
           )}
-          {switchOrderData()![0].map((order: OrderDataType) => {
+          {/* {switchOrderData()![0].map((order: OrderDataType) => {
             return (
               <OrderTicket key={order.id} orderData={order} grayed={false} />
             );
-          })}
-          {selectedTab !== "5" &&
-            switchOrderData()![1].map((order: OrderDataType) => {
-              return <OrderTicket key={order.id} orderData={order} grayed />;
-            })}
-        </section>
+          })} */}
+          <div
+            style={{
+              height: `${switchOrderData()![0].length * itemHeight}px`,
+              width: "100%",
+              // display: "flex",
+            }}
+          >
+            <div
+              style={{
+                transform: `translateY(${overScanStartIndex * itemHeight}px)`,
+                width: "100%",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              {generateRows()}
+              {selectedTab !== "5" &&
+                switchOrderData()![1].map((order: OrderDataType) => {
+                  return (
+                    <OrderTicket key={order.id} orderData={order} grayed />
+                  );
+                })}
+            </div>
+          </div>
+        </ul>
       </main>
     </>
   );
