@@ -40,11 +40,11 @@ function App() {
   const [
     addCancelledOrders,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    deleteCancelledOrders,
+    _deleteCancelledOrders,
     cancelledOrders,
     grayedCancelledOrders,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    cancelledMap,
+    _cancelledMap,
   ] = useOrderData();
   const [searchPrice, setSearchPrice] = useState("0");
   const [validInput, setValidInput] = useState(true);
@@ -238,7 +238,7 @@ function App() {
       <header className="mainHeader">
         <h1 id="mainTitle">City Storage Systems</h1>
       </header>
-      <main className="main-tabs-section">
+      <main className="mainTabsSection">
         <Tabs
           selectedTab={selectedTab}
           handleTabSelection={handleTabSelection}
@@ -252,7 +252,7 @@ function App() {
           {selectedTab == "5" && (
             <div className="currencyInputContainer">
               <label style={{ fontSize: "20px" }}></label>
-              {`Search Price: `}
+              {`Search Price: $`}
               <ControlledInput
                 value={searchPrice}
                 onChange={changeSearchPrice}
@@ -274,7 +274,13 @@ function App() {
                 transform: `translateY(${overScanStartIndex * itemHeight}px)`,
               }}
             >
+              {selectedTab === "5" && (
+                <p className="numberOfResults">
+                  Number of results: {switchOrderData()![0].length}
+                </p>
+              )}
               {generateRows()}
+
               {selectedTab !== "5" &&
                 switchOrderData()![1].map((order: OrderDataType) => {
                   return (

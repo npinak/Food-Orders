@@ -31,24 +31,24 @@
 }
 
 .buttonCooked {
-  background-color: #ffec5c;
+  background-color: #f5cb5c;
 }
 .buttonCooked:hover {
-  background-color: #ffec5c;
+  background-color: #f5cb5c;
 }
 
 .buttonDriver {
-  background-color: #eceae9;
+  background-color: #ff758f;
 }
 .buttonDriver:hover {
-  background-color: #eceae9;
+  background-color: #ff758f;
 }
 
 .buttonDelivered {
-  background-color: #afe9bb;
+  background-color: #40916c;
 }
 .buttonDelivered:hover {
-  background-color: #afe9bb;
+  background-color: #40916c;
 }
 
 .buttonCancelled {
@@ -59,10 +59,10 @@
 }
 
 .buttonSearch {
-  background-color: plum;
+  background-color: #4895ef;
 }
 .buttonSearch:hover {
-  background-color: plum;
+  background-color: #4895ef;
 }
 
 #searchButton {

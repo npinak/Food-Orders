@@ -67,7 +67,7 @@ function TabButtons({ selectedTab, handleTabSelection }: TabsProps) {
       </button>
       <button
         className={`${ButtonStyles.button} ${
-          selectedTab === "5" ? ButtonStyles.buttonCancelled : ""
+          selectedTab === "5" ? ButtonStyles.buttonSearch : ""
         }`}
         id={ButtonStyles.searchButton}
         onClick={(e) => {

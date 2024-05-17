@@ -11,9 +11,11 @@
 
 .mainHeader {
   display: flex;
+  color: #003554;
   justify-content: start;
   align-items: center;
   height: 10%;
+  margin-bottom: 10px;
 }
 
 #mainTitle {
@@ -26,7 +28,7 @@
 
 /* Main Section Start */
 
-.main-tabs-section {
+.mainTabsSection {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -48,6 +50,8 @@
   gap: 10px;
   overflow-y: auto;
   padding-top: 10px;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
 }
 
 .totalHeightContainer {
@@ -61,6 +65,9 @@
   align-items: center;
 }
 
+.numberOfResults {
+  margin-bottom: 10px;
+}
 /* Tab Panel  End */
 
 /* Currency Input Start */
