@@ -70,4 +70,13 @@
   align-items: center;
 }
 
+.currencyInput:focus {
+  outline: none;
+}
+
+.currencyInput_Invalid {
+  border-color: red;
+  background-color: red;
+}
+
 /* Currency Input End */

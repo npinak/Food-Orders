@@ -16,15 +16,7 @@ const ControlledInput: React.FC<InputProps> = (props) => {
     onChange?.(e);
   };
 
-  return (
-    <input
-      ref={ref}
-      value={value}
-      type="tel"
-      onChange={handleChange}
-      {...rest}
-    />
-  );
+  return <input ref={ref} value={value} onChange={handleChange} {...rest} />;
 };
 
 export default ControlledInput;

@@ -4,6 +4,7 @@ import OrderTicket from "./components/OrderTicket";
 import { useOrderData } from "./utils/useOrderData";
 import { OrderDataType } from "./Types/OrderDataTypes";
 import "./App.css";
+import ControlledInput from "./components/ControlledInput";
 
 function App() {
   const [selectedTab, setSelectedTab] = useState<string>("0");
@@ -45,8 +46,9 @@ function App() {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     cancelledMap,
   ] = useOrderData();
-  const [dollars, setDollars] = useState(0);
-  const [cents, setCents] = useState(0);
+  const [searchPrice, setSearchPrice] = useState("0");
+  const [validInput, setValidInput] = useState(true);
+
   const searchMap = useRef(new Map());
   const [scrollTop, setScrollTop] = useState(0);
   const itemHeight = 70;
@@ -96,7 +98,6 @@ function App() {
 
     if (orderArray[0].length > 0) {
       const createdArray = orderArray[0];
-      console.log(createdArray);
 
       addCreatedOrders(createdArray);
     }
@@ -173,53 +174,39 @@ function App() {
         return [cancelledOrders, grayedCancelledOrders];
       case "5": {
         //get input value and convert to cents
-        // const dollarsAndCents = searchPrice?.split(".");
+        const dollarsAndCents = searchPrice?.split(".");
 
-        const finalAmout = dollars * 100 + cents;
+        if (dollarsAndCents[1]?.length === 1) {
+          dollarsAndCents[1] = dollarsAndCents[1] + "0";
+        }
 
-        //get input value from map
-        const searchResults = searchMap.current.get(finalAmout);
-        //return
+        if (dollarsAndCents[1]?.length > 2) {
+          dollarsAndCents[1] = dollarsAndCents[1].slice(0, 2);
+        }
+
+        const finalAmount =
+          parseFloat(dollarsAndCents[0]) * 100 +
+          (Number.isNaN(parseFloat(dollarsAndCents[1]))
+            ? 0
+            : parseFloat(dollarsAndCents[1]));
+
+        const searchResults = searchMap.current.get(finalAmount);
+
         return [searchResults || [], []];
       }
     }
   };
 
-  // function changeSearchPrice(e: React.ChangeEvent<HTMLInputElement>) {
-  //   console.log(e.currentTarget.value);
-  //   const searchValue = parseFloat(e.currentTarget.value);
+  function changeSearchPrice(e: React.ChangeEvent<HTMLInputElement>) {
+    const regex = /^[0-9]\d*(((,\d{3}){1})?(\.\d{0,2})?)$/;
 
-  //   if (Number.isNaN(searchValue)) {
-  //     setSearchPrice("0");
-  //   } else {
-  //     setSearchPrice(searchValue.toFixed(2));
-  //   }
-  // }
-
-  function handleCentsChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const searchValue = parseFloat(e.currentTarget.value);
-
-    if (Number.isNaN(searchValue)) {
-      setCents(0);
+    if (regex.test(e.currentTarget.value) || e.currentTarget.value == "") {
+      setValidInput(true);
     } else {
-      if (searchValue > 99) {
-        setCents(99);
-      } else if (searchValue < 0) {
-        setCents(0);
-      } else {
-        setCents(searchValue);
-      }
+      setValidInput(false);
     }
-  }
 
-  function handleDollarsChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const searchValue = parseFloat(e.currentTarget.value);
-
-    if (Number.isNaN(searchValue)) {
-      setDollars(0);
-    } else {
-      setDollars(searchValue);
-    }
+    setSearchPrice(e.currentTarget.value);
   }
 
   let renderedNodeCount =
@@ -266,34 +253,15 @@ function App() {
             <div className="currencyInputContainer">
               <label style={{ fontSize: "20px" }}></label>
               {`Search Price: `}
-              {/* <ControlledInput
-                  // type="tel"
-                  value={searchPrice}
-                  onChange={changeSearchPrice}
-                /> */}
-              <input
-                type="number"
-                min="0"
-                style={{ width: "40px", textAlign: "right" }}
-                value={dollars}
-                onChange={handleDollarsChange}
-              />
-              <p>.</p>
-              <input
-                type="number"
-                step="01"
-                min="0"
-                style={{ width: "40px", textAlign: "left" }}
-                value={cents}
-                onChange={handleCentsChange}
+              <ControlledInput
+                value={searchPrice}
+                onChange={changeSearchPrice}
+                className={` currencyInput ${
+                  validInput ? "" : "currencyInput_Invalid"
+                }`}
               />
             </div>
           )}
-          {/* {switchOrderData()![0].map((order: OrderDataType) => {
-            return (
-              <OrderTicket key={order.id} orderData={order} grayed={false} />
-            );
-          })} */}
           <div
             className="totalHeightContainer"
             style={{
