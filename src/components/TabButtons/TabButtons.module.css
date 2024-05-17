@@ -6,14 +6,6 @@
   height: 50px;
 }
 
-#createdButton {
-  border-top-left-radius: 20px;
-}
-
-#cancelledButton {
-  border-top-right-radius: 20px;
-}
-
 .button {
   width: 20%;
   max-width: 300px;
@@ -33,6 +25,9 @@
 }
 .buttonCreated:hover {
   background-color: #97c0d8;
+}
+#createdButton {
+  border-top-left-radius: 20px;
 }
 
 .buttonCooked {
@@ -61,4 +56,15 @@
 }
 .buttonCancelled:hover {
   background-color: #fe7b72;
+}
+
+.buttonSearch {
+  background-color: plum;
+}
+.buttonSearch:hover {
+  background-color: plum;
+}
+
+#searchButton {
+  border-top-right-radius: 20px;
 }

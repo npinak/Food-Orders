@@ -52,3 +52,12 @@
 }
 
 /* Tab Panel  End */
+
+/* Currency Input Start */
+
+.currencyInputContainer {
+  display: flex;
+  align-items: center;
+}
+
+/* Currency Input End */

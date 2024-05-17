@@ -16,13 +16,15 @@ export function useOrderData(): [
   const addOrder = (order: OrderDataType[]) => {
     const newOrderArray: OrderDataType[] = [...orders, ...order];
 
-    setOrders(newOrderArray);
-
     order.forEach((orderEvent, index) => {
       orderMap.current.set(orderEvent.id, {
         index: index + orders.length,
         currentStatus: orderEvent.event_name,
       });
+    });
+
+    setOrders(() => {
+      return newOrderArray;
     });
   };
 

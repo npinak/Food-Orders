@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Tabs from "./components/TabButtons";
+import ControlledInput from "./components/ControlledInput";
 import OrderTicket from "./components/OrderTicket";
 import { useOrderData } from "./utils/useOrderData";
 import { OrderDataType } from "./Types/OrderDataTypes";
@@ -45,6 +46,8 @@ function App() {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     cancelledMap,
   ] = useOrderData();
+  const [searchPrice, setSearchPrice] = useState<string>("0");
+  const searchMap = useRef(new Map());
 
   // @ts-expect-error -- socket is imported via CDN
   socket.on("order_event", (order: OrderDataType[]) => {
@@ -53,6 +56,26 @@ function App() {
     order.forEach((orderEvent: OrderDataType) => {
       if (orderEvent.event_name === "CREATED") {
         orderArray[0].push(orderEvent);
+
+        if (searchMap.current.has(orderEvent.price)) {
+          const searchArray = searchMap.current.get(orderEvent.price);
+
+          if (
+            searchArray.some(
+              (createdOrder: OrderDataType) => createdOrder.id === orderEvent.id
+            )
+          ) {
+            return;
+          }
+
+          searchArray.push(orderEvent);
+
+          searchMap.current.set(orderEvent.price, searchArray);
+        } else {
+          const searchArray = [];
+          searchArray.push(orderEvent);
+          searchMap.current.set(orderEvent.price, searchArray);
+        }
       } else if (orderEvent.event_name === "COOKED") {
         orderArray[1].push(orderEvent);
       } else if (orderEvent.event_name === "DRIVER_RECEIVED") {
@@ -139,8 +162,35 @@ function App() {
         return [deliveredOrders, grayedDeliveredOrders];
       case "4":
         return [cancelledOrders, grayedCancelledOrders];
+      case "5": {
+        //get input value and convert to cents
+        const dollarsAndCents = searchPrice?.split(".");
+
+        const cents =
+          parseFloat(dollarsAndCents[0]) * 100 + parseFloat(dollarsAndCents[1]);
+
+        //get input value from map
+        const searchResults = searchMap.current.get(cents);
+        //return
+        return [searchResults || [], []];
+      }
     }
   };
+
+  function changeSearchPrice(e: React.ChangeEvent<HTMLInputElement>) {
+    console.log(e.currentTarget.value);
+    const searchValue = parseFloat(e.currentTarget.value);
+
+    if (Number.isNaN(searchValue)) {
+      setSearchPrice("0");
+    } else {
+      setSearchPrice(searchValue.toFixed(2));
+    }
+  }
+
+  // useEffect(() => {
+  //   console.log(searchPrice);
+  // }, [searchPrice]);
 
   return (
     <>
@@ -153,14 +203,38 @@ function App() {
           handleTabSelection={handleTabSelection}
         />
         <section className="tabPanelContainer">
-          {switchOrderData()![0].map((order) => {
+          {selectedTab == "5" && (
+            <div className="currencyInputContainer">
+              <label style={{ fontSize: "20px" }}></label>
+              {`Search Price: `}
+              {/* <ControlledInput
+                  // type="tel"
+                  value={searchPrice}
+                  onChange={changeSearchPrice}
+                /> */}
+              <input
+                type="number"
+                min="0"
+                style={{ width: "40px", textAlign: "right" }}
+              />
+              <p>.</p>
+              <input
+                type="number"
+                min="1"
+                max="5"
+                style={{ width: "40px", textAlign: "left" }}
+              />
+            </div>
+          )}
+          {switchOrderData()![0].map((order: OrderDataType) => {
             return (
               <OrderTicket key={order.id} orderData={order} grayed={false} />
             );
           })}
-          {switchOrderData()![1].map((order) => {
-            return <OrderTicket key={order.id} orderData={order} grayed />;
-          })}
+          {selectedTab !== "5" &&
+            switchOrderData()![1].map((order: OrderDataType) => {
+              return <OrderTicket key={order.id} orderData={order} grayed />;
+            })}
         </section>
       </main>
     </>

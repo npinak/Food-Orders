@@ -1,7 +1,8 @@
+import { memo } from "react";
 import OrderTicketStyles from "./OrderTicket.module.css";
 import { OrderTicketProps } from "./OrderTicket.types";
 
-function OrderTicket({ orderData, grayed }: OrderTicketProps) {
+const OrderTicket = memo(({ orderData, grayed }: OrderTicketProps) => {
   return (
     <div
       className={`${
@@ -28,6 +29,6 @@ function OrderTicket({ orderData, grayed }: OrderTicketProps) {
       </div>
     </div>
   );
-}
+});
 
 export default OrderTicket;
