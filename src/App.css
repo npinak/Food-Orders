@@ -50,6 +50,17 @@
   padding-top: 10px;
 }
 
+.totalHeightContainer {
+  width: 100%;
+}
+
+.translateContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 /* Tab Panel  End */
 
 /* Currency Input Start */

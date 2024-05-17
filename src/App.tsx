@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Tabs from "./components/TabButtons";
-import ControlledInput from "./components/ControlledInput";
 import OrderTicket from "./components/OrderTicket";
 import { useOrderData } from "./utils/useOrderData";
 import { OrderDataType } from "./Types/OrderDataTypes";
@@ -49,6 +48,13 @@ function App() {
   const [dollars, setDollars] = useState(0);
   const [cents, setCents] = useState(0);
   const searchMap = useRef(new Map());
+  const [scrollTop, setScrollTop] = useState(0);
+  const itemHeight = 70;
+  const overScan = 10;
+  const windowHeight = window.innerHeight * 0.9;
+  const finalWindowHeight = windowHeight * 0.8;
+  const startIndex = Math.floor(scrollTop / itemHeight);
+  const overScanStartIndex = Math.max(0, startIndex - overScan);
 
   // @ts-expect-error -- socket is imported via CDN
   socket.on("order_event", (order: OrderDataType[]) => {
@@ -95,59 +101,58 @@ function App() {
       addCreatedOrders(createdArray);
     }
 
-    //todo uncomment this
-    // if (orderArray[1].length > 0) {
-    //   const cookedArray = orderArray[1];
-    //   addCookedOrders(cookedArray);
+    if (orderArray[1].length > 0) {
+      const cookedArray = orderArray[1];
+      addCookedOrders(cookedArray);
 
-    //   deleteCreatedOrders(cookedArray);
-    // }
-    // if (orderArray[2].length > 0) {
-    //   const driverArray = orderArray[2];
-    //   addDriverOrders(driverArray);
+      deleteCreatedOrders(cookedArray);
+    }
+    if (orderArray[2].length > 0) {
+      const driverArray = orderArray[2];
+      addDriverOrders(driverArray);
 
-    //   deleteCookedOrders(driverArray);
-    // }
-    // if (orderArray[3].length > 0) {
-    //   const deliveredArray = orderArray[3];
-    //   addDeliveredOrders(deliveredArray);
+      deleteCookedOrders(driverArray);
+    }
+    if (orderArray[3].length > 0) {
+      const deliveredArray = orderArray[3];
+      addDeliveredOrders(deliveredArray);
 
-    //   deleteDriverOrders(deliveredArray);
-    // }
-    // if (orderArray[4].length > 0) {
-    //   const cancelledArray = orderArray[4];
-    //   addCancelledOrders(cancelledArray);
+      deleteDriverOrders(deliveredArray);
+    }
+    if (orderArray[4].length > 0) {
+      const cancelledArray = orderArray[4];
+      addCancelledOrders(cancelledArray);
 
-    //   const removeArray: OrderDataType[][] = [[], [], [], []];
+      const removeArray: OrderDataType[][] = [[], [], [], []];
 
-    //   cancelledArray.forEach((cancelledOrder) => {
-    //     if (createdMap.current.has(cancelledOrder.id)) {
-    //       removeArray[0].push(cancelledOrder);
-    //     }
-    //     if (cookedMap.current.has(cancelledOrder.id)) {
-    //       removeArray[1].push(cancelledOrder);
-    //     }
-    //     if (driverMap.current.has(cancelledOrder.id)) {
-    //       removeArray[2].push(cancelledOrder);
-    //     }
-    //     if (deliveredMap.current.has(cancelledOrder.id)) {
-    //       removeArray[3].push(cancelledOrder);
-    //     }
-    //   });
+      cancelledArray.forEach((cancelledOrder) => {
+        if (createdMap.current.has(cancelledOrder.id)) {
+          removeArray[0].push(cancelledOrder);
+        }
+        if (cookedMap.current.has(cancelledOrder.id)) {
+          removeArray[1].push(cancelledOrder);
+        }
+        if (driverMap.current.has(cancelledOrder.id)) {
+          removeArray[2].push(cancelledOrder);
+        }
+        if (deliveredMap.current.has(cancelledOrder.id)) {
+          removeArray[3].push(cancelledOrder);
+        }
+      });
 
-    //   if (removeArray[0].length > 0) {
-    //     deleteCreatedOrders(removeArray[0]);
-    //   }
-    //   if (removeArray[1].length > 0) {
-    //     deleteCookedOrders(removeArray[1]);
-    //   }
-    //   if (removeArray[2].length > 0) {
-    //     deleteDriverOrders(removeArray[2]);
-    //   }
-    //   if (removeArray[3].length > 0) {
-    //     deleteDeliveredOrders(removeArray[3]);
-    //   }
-    // }
+      if (removeArray[0].length > 0) {
+        deleteCreatedOrders(removeArray[0]);
+      }
+      if (removeArray[1].length > 0) {
+        deleteCookedOrders(removeArray[1]);
+      }
+      if (removeArray[2].length > 0) {
+        deleteDriverOrders(removeArray[2]);
+      }
+      if (removeArray[3].length > 0) {
+        deleteDeliveredOrders(removeArray[3]);
+      }
+    }
   });
 
   const handleTabSelection = (tab: string): void => {
@@ -217,24 +222,13 @@ function App() {
     }
   }
 
-  const [scrollTop, setScrollTop] = useState(0);
-  const itemHeight = 70;
-  const overScan = 10;
-  const windowHeight = window.innerHeight * 0.9;
-  const finalWindowHeight = windowHeight * 0.8;
-  const startIndex = Math.floor(scrollTop / itemHeight);
-  const endIndex = Math.floor((scrollTop + finalWindowHeight) / itemHeight);
-  const overScanStartIndex = Math.max(0, startIndex - overScan);
-  const overScanEndIndex = Math.min(
-    switchOrderData()![0].length,
-    endIndex + overScan
-  );
-
-  let renderedNodeCount = Math.floor(windowHeight / itemHeight) + 2 * overScan;
+  let renderedNodeCount =
+    Math.floor(finalWindowHeight / itemHeight) + 2 * overScan;
   renderedNodeCount = Math.min(
     switchOrderData()![0].length - startIndex,
     renderedNodeCount
   );
+
   function generateRows() {
     const items: JSX.Element[] = [];
 
@@ -249,11 +243,9 @@ function App() {
         );
       }
     }
-
     return items;
   }
 
-  // console.log(switchOrderData()![0][0]);
   return (
     <>
       <header className="mainHeader">
@@ -303,19 +295,15 @@ function App() {
             );
           })} */}
           <div
+            className="totalHeightContainer"
             style={{
               height: `${switchOrderData()![0].length * itemHeight}px`,
-              width: "100%",
-              // display: "flex",
             }}
           >
             <div
+              className="translateContainer"
               style={{
                 transform: `translateY(${overScanStartIndex * itemHeight}px)`,
-                width: "100%",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
               }}
             >
               {generateRows()}
