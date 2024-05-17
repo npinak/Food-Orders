@@ -46,7 +46,8 @@ function App() {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     cancelledMap,
   ] = useOrderData();
-  const [searchPrice, setSearchPrice] = useState<string>("0");
+  const [dollars, setDollars] = useState(0);
+  const [cents, setCents] = useState(0);
   const searchMap = useRef(new Map());
 
   // @ts-expect-error -- socket is imported via CDN
@@ -164,33 +165,54 @@ function App() {
         return [cancelledOrders, grayedCancelledOrders];
       case "5": {
         //get input value and convert to cents
-        const dollarsAndCents = searchPrice?.split(".");
+        // const dollarsAndCents = searchPrice?.split(".");
 
-        const cents =
-          parseFloat(dollarsAndCents[0]) * 100 + parseFloat(dollarsAndCents[1]);
+        const finalAmout = dollars * 100 + cents;
 
         //get input value from map
-        const searchResults = searchMap.current.get(cents);
+        const searchResults = searchMap.current.get(finalAmout);
         //return
         return [searchResults || [], []];
       }
     }
   };
 
-  function changeSearchPrice(e: React.ChangeEvent<HTMLInputElement>) {
-    console.log(e.currentTarget.value);
+  // function changeSearchPrice(e: React.ChangeEvent<HTMLInputElement>) {
+  //   console.log(e.currentTarget.value);
+  //   const searchValue = parseFloat(e.currentTarget.value);
+
+  //   if (Number.isNaN(searchValue)) {
+  //     setSearchPrice("0");
+  //   } else {
+  //     setSearchPrice(searchValue.toFixed(2));
+  //   }
+  // }
+
+  function handleCentsChange(e: React.ChangeEvent<HTMLInputElement>) {
     const searchValue = parseFloat(e.currentTarget.value);
 
     if (Number.isNaN(searchValue)) {
-      setSearchPrice("0");
+      setCents(0);
     } else {
-      setSearchPrice(searchValue.toFixed(2));
+      if (searchValue > 99) {
+        setCents(99);
+      } else if (searchValue < 0) {
+        setCents(0);
+      } else {
+        setCents(searchValue);
+      }
     }
   }
 
-  // useEffect(() => {
-  //   console.log(searchPrice);
-  // }, [searchPrice]);
+  function handleDollarsChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const searchValue = parseFloat(e.currentTarget.value);
+
+    if (Number.isNaN(searchValue)) {
+      setDollars(0);
+    } else {
+      setDollars(searchValue);
+    }
+  }
 
   return (
     <>
@@ -216,13 +238,17 @@ function App() {
                 type="number"
                 min="0"
                 style={{ width: "40px", textAlign: "right" }}
+                value={dollars}
+                onChange={handleDollarsChange}
               />
               <p>.</p>
               <input
                 type="number"
-                min="1"
-                max="5"
+                step="01"
+                min="0"
                 style={{ width: "40px", textAlign: "left" }}
+                value={cents}
+                onChange={handleCentsChange}
               />
             </div>
           )}
