@@ -2,7 +2,6 @@ import { TabsProps } from "./TabButtons.types";
 import ButtonStyles from "./TabButtons.module.css";
 
 function TabButtons({ selectedTab, handleTabSelection }: TabsProps) {
-  // todo - maybe add hover classes to selected buttons
   return (
     <menu className={ButtonStyles.tabButtons}>
       <button
