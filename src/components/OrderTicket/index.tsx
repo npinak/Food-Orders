@@ -25,7 +25,7 @@ const OrderTicket = memo(({ orderData, grayed }: OrderTicketProps) => {
         </p>
       </div>
       <div className={OrderTicketStyles.orderTicketSection}>
-        {orderData.price}
+        {orderData.price}¢
       </div>
     </li>
   );
