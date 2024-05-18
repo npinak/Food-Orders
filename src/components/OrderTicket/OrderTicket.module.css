@@ -13,6 +13,7 @@
 .orderTicket_grayed {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   width: 90%;
   background-color: #988f89;
   min-height: 60px;
